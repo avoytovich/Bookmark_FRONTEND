@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Grid, Typography, TextField, Button } from '@material-ui/core';
 import { LoginOutlined } from '@ant-design/icons';
 import { withRouter, Link } from 'react-router-dom';
@@ -32,11 +32,6 @@ function LandingPage(props) {
       placeholder: 'your password',
     },
   ];
-
-  useEffect(
-    () => console.log('localStorage.state', localStorage.getItem('state')),
-    []
-  );
 
   const handleChange = (value, label) => {
     switch (label) {

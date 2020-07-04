@@ -12,6 +12,7 @@ import { API } from './../../helper/constants';
 import Head from './../Header';
 import Popover from './../shared/Popover';
 import Add_Bookmark from './../shared/Popover/Add_Bookmark';
+import Move_Bookmark from './../shared/Popover/Move_Bookmark';
 import Search from './../shared/Search';
 
 import './subgroup.sass';
@@ -27,6 +28,8 @@ function SubGroup(props) {
     link: '',
     searchWords: [],
   });
+  const [moveGroup, setMoveGroup] = useState();
+  const [moveSubGroup, setMoveSubGroup] = useState();
   const [delBookmarks, setDelBookmarks] = useState([]);
 
   const user_id = get(props, 'match.params.id');
@@ -139,6 +142,44 @@ function SubGroup(props) {
   const handleChangeAddBookmarkSearchWords = value =>
     setNewBookmark({ ...newBookmark, searchWords: value.split(' ') });
 
+  const sendMoveBookmarkRequest = useCallback(
+    async data => {
+      if (isSending) return;
+      setIsSending(true);
+      await wrapRequest({
+        method: 'POST',
+        url: `${
+          API.URL[process.env.NODE_ENV]
+        }/user/${user_id}/group/${group_id}/subgroup/${subGroup_id}/bookmark/${
+          delBookmarks[0].id
+        }/bookmark_move`,
+        data,
+        mode: 'cors',
+        cache: 'default',
+      })
+        .then(data => {
+          if ([200, 201].includes(data.status)) {
+            setDelBookmarks([]);
+            setExecFetch(true);
+            setClose(false);
+            props.dispatchSuccessNotifiction('successNotification', {
+              message: data.data.message,
+            });
+            props.history.push(
+              `/user/${user_id}/group/${moveGroup}/subgroup/${moveSubGroup}`
+            );
+            setExecFetch(true);
+          }
+        })
+        .catch(e => props.dispatchErrorNotifiction('errorNotification', e));
+      setIsSending(false);
+    },
+    [data, delBookmarks[0]]
+  );
+
+  const handleChangeMoveBookmarkGroup = value => setMoveGroup(value);
+  const handleChangeMoveBookmarkSubGroup = value => setMoveSubGroup(value);
+
   const sendDeleteBookmarkRequest = useCallback(async () => {
     if (isSending) return;
     setIsSending(true);
@@ -197,6 +238,24 @@ function SubGroup(props) {
                       >
                         Delete
                       </Button>
+                      {delBookmarks.length == 1 ? (
+                        <Popover title="Move" color="orange">
+                          {handleClose => (
+                            <Move_Bookmark
+                              handleChangeMoveBookmarkGroup={
+                                handleChangeMoveBookmarkGroup
+                              }
+                              handleChangeMoveBookmarkSubGroup={
+                                handleChangeMoveBookmarkSubGroup
+                              }
+                              sendMoveBookmarkRequest={sendMoveBookmarkRequest}
+                              close={close}
+                              setClose={setClose}
+                              handleClose={handleClose}
+                            />
+                          )}
+                        </Popover>
+                      ) : null}
                       <Popover title="Add" color="green">
                         {handleClose => (
                           <Add_Bookmark
