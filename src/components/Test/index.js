@@ -8,7 +8,7 @@ function Test(props) {
   // console.log('Test props', props);
 
   useEffect(() => {
-    props.dispatchErrorNotifiction('errorNotification', { message: 'hayu' });
+    props.dispatchErrorNotifiction('errorNotification', { message: 'test' });
   }, []);
 
   return <h1>Test</h1>;

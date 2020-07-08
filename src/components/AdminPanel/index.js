@@ -23,10 +23,6 @@ function AdminPage(props) {
   const user_id = get(props, 'match.params.id');
 
   useEffect(() => {
-    props.dispatchErrorNotifiction('errorNotification', { message: 'hayu' });
-  }, []);
-
-  useEffect(() => {
     const fetchUser = async () => {
       const getUser = await wrapRequest({
         method: 'GET',
@@ -122,7 +118,12 @@ function AdminPage(props) {
       mode: 'cors',
       cache: 'default',
     })
-      .then(data => [200, 201].includes(data.status) && setExec(!exec))
+      .then(data => {
+        [200, 201].includes(data.status) && setExec(!exec);
+        props.dispatchSuccessNotifiction('successNotification', {
+          message: data.data.message,
+        });
+      })
       .catch(e => props.dispatchErrorNotifiction('errorNotification', e));
     setIsSending(false);
   };
@@ -137,7 +138,12 @@ function AdminPage(props) {
       mode: 'cors',
       cache: 'default',
     })
-      .then(data => [200, 201].includes(data.status) && setExec(!exec))
+      .then(data => {
+        [200, 201].includes(data.status) && setExec(!exec);
+        props.dispatchSuccessNotifiction('successNotification', {
+          message: data.data.message,
+        });
+      })
       .catch(e => props.dispatchErrorNotifiction('errorNotification', e));
     setIsSending(false);
   };
@@ -205,6 +211,7 @@ const mapDispatchToProps = dispatch => {
   const actionData = (name, payload) => dispatch(action(name, payload));
   return {
     dispatchFetchGroup: actionData,
+    dispatchSuccessNotifiction: actionData,
     dispatchErrorNotifiction: actionData,
   };
 };
