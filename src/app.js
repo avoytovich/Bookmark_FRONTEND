@@ -53,7 +53,11 @@ function App(props) {
           <Route
             path="/user/:id/admin"
             render={() =>
-              checkAuth() ? <Redirect to="/bookmark" /> : <AdminPanel />
+              !store.isAdmin || checkAuth() ? (
+                <Redirect to="/bookmark" />
+              ) : (
+                <AdminPanel />
+              )
             }
           />
           <Route
