@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { Grid, Typography } from '@material-ui/core';
-import { Button, Table } from 'antd';
+import { Table } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import { get } from 'lodash';
 
@@ -11,6 +11,7 @@ import { wrapRequest } from './../../utils/api';
 import { API } from './../../helper/constants';
 import Head from './../Header';
 import Popover from './../shared/Popover';
+import Delete_Confirmation from './../shared/Popover/Delete_Confirmation';
 import Add_Bookmark from './../shared/Popover/Add_Bookmark';
 import Move_Bookmark from './../shared/Popover/Move_Bookmark';
 import Search from './../shared/Search';
@@ -192,7 +193,10 @@ function SubGroup(props) {
       mode: 'cors',
       cache: 'default',
     })
-      .then(data => [200, 201].includes(data.status) && setExecFetch(true))
+      .then(data => {
+        setDelBookmarks([]);
+        [200, 201].includes(data.status) && setExecFetch(true);
+      })
       .catch(e => props.dispatchErrorNotifiction('errorNotification', e));
     setIsSending(false);
   }, [delBookmarks]);
@@ -228,16 +232,15 @@ function SubGroup(props) {
                       />
                     </div>
                     <div className="subgroup-nav">
-                      <Button
-                        type="primary"
-                        style={{
-                          border: 'red',
-                          backgroundColor: 'red',
-                        }}
-                        onClick={sendDeleteBookmarkRequest}
-                      >
-                        Delete
-                      </Button>
+                      <Popover title="Delete" color="red">
+                        {handleClose => (
+                          <Delete_Confirmation
+                            facilities={delBookmarks}
+                            sendDeleteRequest={sendDeleteBookmarkRequest}
+                            handleClose={handleClose}
+                          />
+                        )}
+                      </Popover>
                       {delBookmarks.length == 1 ? (
                         <Popover title="Move" color="orange">
                           {handleClose => (

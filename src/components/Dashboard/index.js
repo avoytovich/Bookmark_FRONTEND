@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { Grid } from '@material-ui/core';
 import 'antd/dist/antd.css';
-import { Button, Table } from 'antd';
+import { Table } from 'antd';
 import { get } from 'lodash';
 
 import Head from './../Header';
 import Popover from './../shared/Popover';
+import Delete_Confirmation from './../shared/Popover/Delete_Confirmation';
 import Add_Group from './../shared/Popover/Add_Group';
 import Search from './../shared/Search';
 import connect from './../../utils/connectFunction';
@@ -133,7 +134,10 @@ function Dashboard(props) {
       mode: 'cors',
       cache: 'default',
     })
-      .then(data => [200, 201].includes(data.status) && setExecFetch(true))
+      .then(data => {
+        setDelGroups([]);
+        [200, 201].includes(data.status) && setExecFetch(true);
+      })
       .catch(e => props.dispatchErrorNotifiction('errorNotification', e));
     setIsSending(false);
   }, [delGroups]);
@@ -161,16 +165,15 @@ function Dashboard(props) {
                     )}
                   </div>
                   <div className="group-nav">
-                    <Button
-                      type="primary"
-                      style={{
-                        border: 'red',
-                        backgroundColor: 'red',
-                      }}
-                      onClick={sendDeleteGroupRequest}
-                    >
-                      Delete
-                    </Button>
+                    <Popover title="Delete" color="red">
+                      {handleClose => (
+                        <Delete_Confirmation
+                          facilities={delGroups}
+                          sendDeleteRequest={sendDeleteGroupRequest}
+                          handleClose={handleClose}
+                        />
+                      )}
+                    </Popover>
                     <Popover title="Add" color="green">
                       {handleClose => (
                         <Add_Group
